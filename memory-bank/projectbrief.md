@@ -8,7 +8,7 @@ The RavenDB MCP Server is a Model Context Protocol (MCP) server that enables AI 
 
 1. Enable AI assistants to interact with RavenDB 7.x databases
 2. Provide a standardized interface for database operations
-3. Support authentication methods: certificate-based authentication and non-secured mode
+3. Support non-secured mode authentication (certificate-based auth planned for future)
 4. Maintain persistent connections between tool calls
 5. Implement core RavenDB operations: queries, document management, collection exploration
 
@@ -46,7 +46,7 @@ The initial implementation will focus on:
 
 Development is planned in 4 phases:
 
-1. Core Infrastructure with Certificate Auth
+1. Core Infrastructure with Non-secured Mode Auth
 2. Basic Tools
 3. Additional Tools
 4. Packaging & Documentation

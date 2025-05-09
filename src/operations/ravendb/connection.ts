@@ -5,7 +5,7 @@ import {
   handleRavenDBError,
 } from '../../common/errors.js';
 import { safeLog } from '../../common/utils.js';
-import { AuthenticationMethod, RavenDBConfig } from '../../types/config.js';
+import { RavenDBConfig } from '../../types/config.js';
 
 /**
  * RavenDB connection manager
@@ -180,71 +180,8 @@ export class RavenDBConnection {
    * @returns Authentication options
    */
   private createAuthOptions(): IAuthOptions {
-    switch (this.config.authMethod) {
-      case AuthenticationMethod.ApiKey:
-        if (!this.config.apiKey) {
-          throw new McpError(
-            ErrorCode.InvalidParams,
-            'API key is required for API key authentication. Set RAVENDB_API_KEY environment variable.',
-          );
-        }
-
-        // For API key auth, set the certificate field to the API key
-        return {
-          certificate: this.config.apiKey,
-        };
-
-      case AuthenticationMethod.Certificate:
-        if (!this.config.certPath) {
-          throw new McpError(
-            ErrorCode.InvalidParams,
-            'Certificate path is required for certificate authentication. Set RAVENDB_CERT_PATH environment variable.',
-          );
-        }
-
-        // For certificate auth, load the certificate content from file
-        try {
-          const fs = require('fs');
-          const certContent = fs.readFileSync(this.config.certPath);
-
-          return {
-            type: 'pfx',
-            certificate: certContent,
-            password: this.config.certPassword,
-          };
-        } catch (error) {
-          throw new McpError(
-            ErrorCode.InvalidParams,
-            `Failed to read certificate file: ${
-              error instanceof Error ? error.message : String(error)
-            }`,
-          );
-        }
-
-      case AuthenticationMethod.Username:
-        if (!this.config.username || !this.config.password) {
-          throw new McpError(
-            ErrorCode.InvalidParams,
-            'Username and password are required for username authentication. Set RAVENDB_USERNAME and RAVENDB_PASSWORD environment variables.',
-          );
-        }
-
-        // For username/password auth, construct the auth token as described in RavenDB docs
-        const authToken = {
-          username: this.config.username,
-          password: this.config.password,
-        };
-
-        // Store the base64 encoded token as the certificate
-        return {
-          certificate: Buffer.from(JSON.stringify(authToken)).toString(
-            'base64',
-          ),
-        };
-
-      default:
-        // Default to no authentication (should not happen with our validation)
-        return {};
-    }
+    // Only supporting 'none' authentication method, which means no authentication
+    safeLog('Using non-secured mode (no authentication)');
+    return {};
   }
 }

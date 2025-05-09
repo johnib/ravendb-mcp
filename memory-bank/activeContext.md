@@ -17,7 +17,7 @@ The project has progressed significantly with the following in place:
 
 - Complete project structure established
 - All core tools implemented
-- Both authentication methods implemented (certificate and non-secured mode)
+- Simplified to support only non-secured mode authentication
 - Connection management system implemented
 - Error handling utilities created
 - Input validation with Zod schemas
@@ -28,7 +28,7 @@ According to the implementation plan in the PRD, we've completed most of the pla
 
 - [x] Initial project setup
 - [x] Core server configuration
-- [x] Authentication implementation (certificate and non-secured mode)
+- [x] Authentication implementation (non-secured mode only)
 - [x] Connection management
 - [x] Basic error handling
 - [x] Tool schema definitions
@@ -37,12 +37,13 @@ According to the implementation plan in the PRD, we've completed most of the pla
 
 ### Authentication Strategy
 
-Both authentication methods have been implemented:
+The authentication strategy has been simplified:
 
-- Certificate-based authentication (PFX or PEM)
-- Non-secured mode (no authentication)
+- Only non-secured mode (no authentication) is currently supported
+- This simplification is temporary to focus on core functionality
+- Future versions will re-implement certificate-based authentication
 
-The authentication strategy is configurable via environment variables, allowing users to choose their preferred method based on their security requirements.
+The authentication method is still configurable via environment variables, but currently only 'none' is supported.
 
 ### Connection Management
 

@@ -16,7 +16,6 @@ flowchart TB
         Connection --> Client[RavenDB Node.js Client]
     end
     
-    Auth --> Cert[Certificate Auth]
     Auth --> None[Non-secured Mode]
     Client --> RavenDB[RavenDB Server]
 ```
@@ -32,10 +31,10 @@ flowchart TB
 
 ### 2. Authentication Layer
 
-- Manages authentication methods
-- Handles certificate-based auth and non-secured mode
+- Currently only supports non-secured mode
 - Configurable via environment variables
-- Secures connections to RavenDB
+- Will be expanded to include certificate auth in future
+- Simplified for initial implementation
 
 ### 3. Tool Handlers
 

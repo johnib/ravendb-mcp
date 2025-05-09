@@ -13,7 +13,7 @@ The project has progressed substantially with the following in place:
 - Full project structure established
 - Core documentation created (PRD, README)
 - All planned tools implemented
-- Both authentication methods implemented (certificate and non-secured mode)
+- Simplified to only support non-secured mode authentication
 - Connection management system with persistence
 - Error handling and validation
 - Environment variable configuration
@@ -60,10 +60,10 @@ The project has progressed substantially with the following in place:
 
 ### Authentication Layer
 
-- [x] Certificate-based authentication
+- [ ] Certificate-based authentication (planned for future)
 - [x] Non-secured mode
-- [x] Auth method switching utility
-- [x] Secure credential handling
+- [ ] Auth method switching utility (simplified)
+- [ ] Secure credential handling (not needed for non-secured mode)
 
 ### Connection Management
 
@@ -106,7 +106,7 @@ The project is well-developed with core functionality in place. Current known is
 
 ## Recent Progress
 
-- All authentication methods implemented
+- Simplified authentication to only support non-secured mode
 - All planned tools implemented
 - Connection management system with persistence in place
 - Error handling framework established

@@ -17,9 +17,7 @@ This MCP server allows AI assistants to perform common RavenDB operations includ
 
 - Node.js 16+
 - RavenDB 7.x
-- One of the following authentication methods:
-  - Certificate (.pfx or .pem file)
-  - Non-secured mode (no authentication)
+- Authentication using non-secured mode (no authentication)
 
 ## Installation
 
@@ -38,19 +36,11 @@ npx ravendb-mcp
 Configure the server using environment variables or a `.env` file:
 
 ```
-# Authentication Method
-# Options: certificate, none
-RAVENDB_AUTH_METHOD=certificate
-
-# Certificate Authentication
-RAVENDB_CERT_PATH=/path/to/certificate.pfx
-RAVENDB_CERT_PASSWORD=certificate_password
-
-# Non-secured Mode (no authentication)
-# RAVENDB_AUTH_METHOD=none
+# Authentication Method (Only non-secured mode is supported)
+RAVENDB_AUTH_METHOD=none
 
 # Connection
-RAVENDB_URL=https://your-ravendb-server:port
+RAVENDB_URL=http://your-ravendb-server:port
 
 # Optional settings
 RAVENDB_QUERY_TIMEOUT=30000  # Query timeout in milliseconds (optional)
@@ -60,29 +50,7 @@ RAVENDB_QUERY_TIMEOUT=30000  # Query timeout in milliseconds (optional)
 
 To configure this MCP server for use with Cline AI, add the following to your MCP configuration:
 
-#### Certificate Authentication (Default)
-
-```json
-{
-  "mcpServers": {
-    "github.com/johnib/ravendb-mcp": {
-      "disabled": false,
-      "timeout": 60,
-      "command": "npx",
-      "args": ["-y", "ravendb-mcp"],
-      "env": {
-        "RAVENDB_AUTH_METHOD": "certificate",
-        "RAVENDB_CERT_PATH": "/path/to/certificate.pfx",
-        "RAVENDB_CERT_PASSWORD": "certificate_password",
-        "RAVENDB_URL": "https://your-ravendb-server:port"
-      },
-      "transportType": "stdio"
-    }
-  }
-}
-```
-
-#### Non-secured Mode
+#### Non-secured Mode Configuration
 
 ```json
 {

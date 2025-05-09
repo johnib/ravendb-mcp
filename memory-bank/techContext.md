@@ -54,14 +54,10 @@ The server is configured using environment variables or a `.env` file:
 
 ```env
 # Authentication Method
-RAVENDB_AUTH_METHOD=certificate  # Options: certificate, none
-
-# Certificate Authentication
-RAVENDB_CERT_PATH=/path/to/cert.pfx  # For certificate auth (PFX or PEM)
-RAVENDB_CERT_PASSWORD=password  # For certificate auth (optional)
+RAVENDB_AUTH_METHOD=none  # Currently only 'none' is supported
 
 # Connection
-RAVENDB_URL=https://server:port  # Default RavenDB server URL
+RAVENDB_URL=http://server:port  # Default RavenDB server URL
 
 # Optional settings
 RAVENDB_QUERY_TIMEOUT=30000  # Query timeout in milliseconds (optional)
@@ -80,10 +76,8 @@ For integration with Cline AI:
       "command": "npx",
       "args": ["-y", "ravendb-mcp"],
       "env": {
-        "RAVENDB_AUTH_METHOD": "certificate",
-        "RAVENDB_CERT_PATH": "/path/to/certificate.pfx",
-        "RAVENDB_CERT_PASSWORD": "certificate_password",
-        "RAVENDB_URL": "https://your-ravendb-server:port"
+        "RAVENDB_AUTH_METHOD": "none",
+        "RAVENDB_URL": "http://your-ravendb-server:port"
       },
       "transportType": "stdio"
     }
@@ -153,7 +147,7 @@ npx ravendb-mcp
 ### Current Phase
 
 - Basic implementation with core functionality
-- Certificate authentication and non-secured mode
+- Non-secured mode authentication only
 - Essential database operations
 
 ### Future Technical Enhancements

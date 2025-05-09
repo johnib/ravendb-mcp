@@ -28,8 +28,7 @@
 
 ### Authentication
 
-- Implement authentication methods: certificate and non-secured mode
-- Store sensitive information in environment variables
+- Implement only non-secured mode authentication
 - Support .env file for local development
 - Keep authentication logic separate from tool implementation
 
@@ -94,11 +93,11 @@
 - Need to handle timeout and reconnection logic
 - Balance connection pooling vs. single persistent connection
 
-### Authentication Complexity
+### Authentication Limitations
 
-- Certificate loading requires file system access
-- Managing certificate credentials securely
-- Proper handling of non-secured mode with clear security warnings
+- Currently only supporting non-secured mode
+- Non-secured mode should include clear security warnings
+- Future work will re-implement certificate-based authentication
 
 ### Query Performance
 

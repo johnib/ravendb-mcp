@@ -103,6 +103,11 @@ The project is well-developed with core functionality in place. Current known is
 3. **Error Handling**: Creating informative error messages without exposing sensitive information
 4. **Performance**: Managing response times, especially for larger queries
 5. **Configuration**: Ensuring ease of setup while supporting multiple authentication methods
+6. **RavenDB 7.x Compatibility**: Addressing RavenDB 7.x specific requirements:
+   - Connection initialization without auth parameters for non-secured mode
+   - RQL syntax requirements (FROM → WHERE → SELECT order)
+   - Query limitations (ORDER BY issues in certain contexts)
+   - Metadata access patterns
 
 ## Recent Progress
 
@@ -112,6 +117,13 @@ The project is well-developed with core functionality in place. Current known is
 - Error handling framework established
 - Input validation with Zod schemas implemented
 - Response formatting standardized
+- Fixed critical RavenDB 7.x connection issues:
+  - Removed auth options parameter from DocumentStore constructor in non-secured mode
+  - Prevented "Certificate cannot be null" errors by avoiding empty auth objects
+- Fixed RQL syntax compatibility issues:
+  - Updated collection listing query to use proper RavenDB 7.x clause order
+  - Implemented FROM → WHERE → SELECT pattern instead of SQL-style SELECT → FROM → WHERE
+  - Removed problematic ORDER BY clause that caused syntax errors
 
 ## Up Next
 

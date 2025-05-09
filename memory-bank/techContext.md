@@ -87,6 +87,26 @@ For integration with Cline AI:
 
 ## Technical Constraints
 
+### RavenDB 7.x Specific Requirements
+
+- **Connection Initialization**:
+  - For non-secured mode, do NOT provide auth options parameter to DocumentStore constructor
+  - Example: `new DocumentStore(url, database)` instead of `new DocumentStore(url, database, {})`
+  - Providing empty auth options triggers certificate validation even in non-secured mode
+  - This is different from RavenDB 5.x/6.x behavior where empty auth objects were acceptable
+
+- **RQL Syntax Requirements**:
+  - Queries must follow strict clause ordering: FROM → WHERE → SELECT
+  - Unlike SQL, RQL requires FROM clause first
+  - Example: `FROM @all_docs WHERE property = value SELECT field`
+  - ORDER BY clause may cause syntax errors in certain queries (especially collection listing)
+  - Collection metadata must be accessed via `@metadata.@collection` pattern
+
+- **Query Execution**:
+  - RavenDB 7.x enforces stricter query parsing than previous versions
+  - Error messages like "Expected FROM clause but got: SELECT" indicate syntax order issues
+  - Collection listing requires special handling due to syntax constraints
+
 ### Performance Considerations
 
 - Stateful connection management between calls

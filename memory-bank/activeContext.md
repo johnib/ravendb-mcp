@@ -22,6 +22,40 @@ The project has progressed significantly with the following in place:
 - Error handling utilities created
 - Input validation with Zod schemas
 
+## Recent Discoveries and Fixes
+
+### RavenDB 7.x Connection Issues
+
+We discovered a critical issue with RavenDB 7.x connection in non-secured mode:
+
+- When passing an empty auth options object (`{}`) to the DocumentStore constructor, RavenDB tries to use certificate authentication and fails with "Certificate cannot be null"
+- Fix: Omit the auth options parameter entirely when in non-secured mode
+- Implementation: Changed `new DocumentStore(url, database, {})` to `new DocumentStore(url, database)`
+
+### RQL Syntax Requirements in RavenDB 7.x
+
+Found that RavenDB 7.x has stricter RQL syntax requirements:
+
+- SQL-style queries (starting with SELECT) are not supported
+- Correct order is FROM → WHERE → SELECT (opposite of SQL)
+- ORDER BY causes syntax errors in certain query contexts
+- Fix: Rewrote collection listing query to use proper RavenDB 7.x RQL syntax
+
+Example of updated query:
+
+```sql
+# Original (SQL-style, doesn't work):
+SELECT DISTINCT c.@metadata.@collection as collection 
+FROM @all_docs as c 
+WHERE c.@metadata.@collection != null 
+ORDER BY collection
+
+# Updated (RavenDB 7.x style, works):
+FROM @all_docs as c 
+WHERE c.@metadata.@collection != null 
+SELECT DISTINCT c.@metadata.@collection as collection
+```
+
 ## Current Progress
 
 According to the implementation plan in the PRD, we've completed most of the planned phases:
@@ -110,6 +144,8 @@ Ensuring the development environment supports effective testing:
 2. Implementing proper error handling with meaningful messages
 3. Creating a clean abstraction over the RavenDB client
 4. Balancing simplicity with functionality
+5. Handling RavenDB 7.x specific syntax and connection requirements
+6. Adapting to differences between RavenDB 7.x and previous versions
 
 ## Current Questions
 

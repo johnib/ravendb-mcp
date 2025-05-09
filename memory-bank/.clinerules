@@ -31,6 +31,8 @@
 - Implement only non-secured mode authentication
 - Support .env file for local development
 - Keep authentication logic separate from tool implementation
+- For non-secured mode, do not provide auth options to DocumentStore (omit third parameter entirely)
+- Avoid using empty auth objects as this triggers certificate validation even in non-secured mode
 
 ### Connection Management
 
@@ -98,6 +100,14 @@
 - Currently only supporting non-secured mode
 - Non-secured mode should include clear security warnings
 - Future work will re-implement certificate-based authentication
+
+### RavenDB 7.x Specifics
+
+- RQL syntax requires FROM first, then WHERE, then SELECT (different from SQL)
+- Avoid using ORDER BY in collection listing queries (causes syntax errors)
+- Collection listing works best with simpler queries
+- Use proper RQL syntax pattern: FROM → WHERE → SELECT
+- Pay attention to collection references in metadata (use @metadata.@collection pattern)
 
 ### Query Performance
 

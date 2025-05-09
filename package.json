@@ -26,6 +26,7 @@
     "axios": "^1.4.0",
     "dotenv": "^16.0.3",
     "lru-cache": "^9.1.1",
+    "ravendb": "^5.2.11",
     "zod": "^3.21.4",
     "zod-to-json-schema": "^3.20.4"
   },

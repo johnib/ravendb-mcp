@@ -189,13 +189,14 @@ export class RavenDBConnection {
         );
       }
 
+      // According to RavenDB documentation, return an auth options object
+      // without specifying a type property, as it appears that 'api-key' is not a valid value
       return {
-        type: 'api-key',
-        apiKey: this.config.apiKey,
-      };
+        certificate: this.config.apiKey, // Use certificate field for API key
+      } as IAuthOptions;
     }
 
     // Default to no authentication (should not happen with our validation)
-    return {};
+    return {} as IAuthOptions;
   }
 }

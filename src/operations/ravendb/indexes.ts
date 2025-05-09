@@ -1,3 +1,4 @@
+import { McpError } from '@modelcontextprotocol/sdk/types.js';
 import { handleRavenDBError } from '../../common/errors.js';
 import { safeLog } from '../../common/utils.js';
 import { RavenDBConnection } from './connection.js';
@@ -36,6 +37,19 @@ interface FormattedIndex {
 }
 
 /**
+ * Extract error message from any error type
+ *
+ * @param err The error to extract message from
+ * @returns The error message string
+ */
+function getErrorMessage(err: unknown): string {
+  if (err instanceof Error) {
+    return err.message;
+  }
+  return String(err);
+}
+
+/**
  * Show available indexes in the database
  *
  * @param connection The RavenDB connection
@@ -55,37 +69,63 @@ export async function showIndexes(
     const store = connection.getDocumentStore();
 
     try {
-      // Get maintenance operations
-      const maintenance = store.maintenance.forDatabase(database || undefined);
+      // Get database operations
+      const databaseName = database || '';
 
-      // Get all indexes
-      const indexes = await maintenance.send(
-        new store.maintenance.getIndexesOperation(),
-      );
+      // Start a session to work with the database
+      const session = store.openSession(databaseName);
+
+      // Use the session to query for indexes
+      const indexResults = await session.advanced
+        .documentQuery({ collection: '@indexes' })
+        .waitForNonStaleResults()
+        .all();
 
       // Format the indexes for easier consumption
-      const formattedIndexes = indexes.map((index: RavenDBIndex) => {
-        // Simplify the index object to avoid exposing internal details
-        return {
-          name: index.name,
-          type: index.type,
-          maps: index.maps,
-          fields: Object.keys(index.fields || {}),
-          collections: index.collections || [],
-          isStale: index.isStale,
-          priority: index.priority,
-          state: index.state,
-        };
-      });
+      const formattedIndexes: FormattedIndex[] = [];
+
+      if (Array.isArray(indexResults)) {
+        for (const result of indexResults) {
+          const index = result as unknown as RavenDBIndex;
+          formattedIndexes.push({
+            name: index.name || 'Unknown',
+            type: index.type || 'Unknown',
+            maps: Array.isArray(index.maps) ? index.maps : [],
+            fields: Object.keys(index.fields || {}),
+            collections: Array.isArray(index.collections)
+              ? index.collections
+              : [],
+            isStale: Boolean(index.isStale),
+            priority: index.priority || 'Normal',
+            state: index.state || 'Normal',
+          });
+        }
+      }
 
       safeLog(`Found ${formattedIndexes.length} indexes`);
 
       return { indexes: formattedIndexes };
-    } catch (error) {
-      handleRavenDBError(error, 'list indexes');
+    } catch (err) {
+      // Properly handle and log the error, then return empty result
+      safeLog(`Error listing indexes: ${getErrorMessage(err)}`);
+
+      // Only throw if it's an expected type of error that handleRavenDBError can process
+      if (err instanceof Error || err instanceof McpError) {
+        handleRavenDBError(err, 'list indexes');
+      }
+
+      return { indexes: [] }; // Return empty array if error
     }
-  } catch (error) {
-    handleRavenDBError(error, 'list indexes');
+  } catch (err) {
+    // Properly handle and log the error, then return empty result
+    safeLog(`Error in showIndexes: ${getErrorMessage(err)}`);
+
+    // Only throw if it's an expected type of error that handleRavenDBError can process
+    if (err instanceof Error || err instanceof McpError) {
+      handleRavenDBError(err, 'list indexes');
+    }
+
+    return { indexes: [] }; // Return empty array if error
   }
 }
 
@@ -107,46 +147,69 @@ export async function getIndexDetails(
     const database = connection.getCurrentDatabase();
     safeLog(`Getting details for index ${indexName} in database ${database}`);
 
-    // Get document store and create a session
+    // Get document store
     const store = connection.getDocumentStore();
 
     try {
-      // Get maintenance operations
-      const maintenance = store.maintenance.forDatabase(database || undefined);
+      // Get database operations
+      const databaseName = database || '';
 
-      // Get all indexes
-      const indexes = await maintenance.send(
-        new store.maintenance.getIndexesOperation(),
-      );
+      // Start a session to work with the database
+      const session = store.openSession(databaseName);
 
-      // Find the requested index
-      const index = indexes.find((idx: RavenDBIndex) => idx.name === indexName);
+      // Use the session to query for the specific index
+      const indexDoc = await session.load(`@indexes/${indexName}`);
 
-      if (!index) {
+      if (!indexDoc) {
         return { error: `Index '${indexName}' not found` };
       }
 
+      // Cast to our expected type for access
+      const typedIndexDoc = indexDoc as unknown as RavenDBIndex;
+
       // Format the index for easier consumption
       const formattedIndex = {
-        name: index.name,
-        type: index.type,
-        maps: index.maps,
-        reduces: index.reduce,
-        fields: index.fields || {},
-        collections: index.collections || [],
-        configuration: index.configuration || {},
-        isStale: index.isStale,
-        priority: index.priority,
-        state: index.state,
-        lockMode: index.lockMode,
-        createdAt: index.createdAt,
+        name: typedIndexDoc.name || indexName,
+        type: typedIndexDoc.type || 'Unknown',
+        maps: Array.isArray(typedIndexDoc.maps) ? typedIndexDoc.maps : [],
+        reduces: typedIndexDoc.reduce,
+        fields: typedIndexDoc.fields || {},
+        collections: Array.isArray(typedIndexDoc.collections)
+          ? typedIndexDoc.collections
+          : [],
+        configuration: typedIndexDoc.configuration || {},
+        isStale: Boolean(typedIndexDoc.isStale),
+        priority: typedIndexDoc.priority || 'Normal',
+        state: typedIndexDoc.state || 'Normal',
+        lockMode: typedIndexDoc.lockMode,
+        createdAt: typedIndexDoc.createdAt,
       };
 
       return { index: formattedIndex };
-    } catch (error) {
-      handleRavenDBError(error, 'get index details');
+    } catch (err) {
+      // Log the error
+      safeLog(`Error getting index details: ${getErrorMessage(err)}`);
+
+      // Only throw if it's an expected type of error that handleRavenDBError can process
+      if (err instanceof Error || err instanceof McpError) {
+        handleRavenDBError(err, 'get index details');
+      }
+
+      return {
+        error: `Error retrieving index: ${getErrorMessage(err)}`,
+      };
     }
-  } catch (error) {
-    handleRavenDBError(error, 'get index details');
+  } catch (err) {
+    // Log the error
+    safeLog(`Error in getIndexDetails: ${getErrorMessage(err)}`);
+
+    // Only throw if it's an expected type of error that handleRavenDBError can process
+    if (err instanceof Error || err instanceof McpError) {
+      handleRavenDBError(err, 'get index details');
+    }
+
+    return {
+      error: `Error retrieving index: ${getErrorMessage(err)}`,
+    };
   }
 }

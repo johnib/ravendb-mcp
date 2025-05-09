@@ -180,23 +180,71 @@ export class RavenDBConnection {
    * @returns Authentication options
    */
   private createAuthOptions(): IAuthOptions {
-    // Currently we only support API key authentication
-    if (this.config.authMethod === AuthenticationMethod.ApiKey) {
-      if (!this.config.apiKey) {
-        throw new McpError(
-          ErrorCode.InvalidParams,
-          'API key is required for API key authentication. Set RAVENDB_API_KEY environment variable.',
-        );
-      }
+    switch (this.config.authMethod) {
+      case AuthenticationMethod.ApiKey:
+        if (!this.config.apiKey) {
+          throw new McpError(
+            ErrorCode.InvalidParams,
+            'API key is required for API key authentication. Set RAVENDB_API_KEY environment variable.',
+          );
+        }
 
-      // According to RavenDB documentation, return an auth options object
-      // without specifying a type property, as it appears that 'api-key' is not a valid value
-      return {
-        certificate: this.config.apiKey, // Use certificate field for API key
-      } as IAuthOptions;
+        // For API key auth, set the certificate field to the API key
+        return {
+          certificate: this.config.apiKey,
+        };
+
+      case AuthenticationMethod.Certificate:
+        if (!this.config.certPath) {
+          throw new McpError(
+            ErrorCode.InvalidParams,
+            'Certificate path is required for certificate authentication. Set RAVENDB_CERT_PATH environment variable.',
+          );
+        }
+
+        // For certificate auth, load the certificate content from file
+        try {
+          const fs = require('fs');
+          const certContent = fs.readFileSync(this.config.certPath);
+
+          return {
+            type: 'pfx',
+            certificate: certContent,
+            password: this.config.certPassword,
+          };
+        } catch (error) {
+          throw new McpError(
+            ErrorCode.InvalidParams,
+            `Failed to read certificate file: ${
+              error instanceof Error ? error.message : String(error)
+            }`,
+          );
+        }
+
+      case AuthenticationMethod.Username:
+        if (!this.config.username || !this.config.password) {
+          throw new McpError(
+            ErrorCode.InvalidParams,
+            'Username and password are required for username authentication. Set RAVENDB_USERNAME and RAVENDB_PASSWORD environment variables.',
+          );
+        }
+
+        // For username/password auth, construct the auth token as described in RavenDB docs
+        const authToken = {
+          username: this.config.username,
+          password: this.config.password,
+        };
+
+        // Store the base64 encoded token as the certificate
+        return {
+          certificate: Buffer.from(JSON.stringify(authToken)).toString(
+            'base64',
+          ),
+        };
+
+      default:
+        // Default to no authentication (should not happen with our validation)
+        return {};
     }
-
-    // Default to no authentication (should not happen with our validation)
-    return {} as IAuthOptions;
   }
 }

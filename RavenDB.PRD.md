@@ -20,16 +20,13 @@ Companies using RavenDB in production environments who wish to enable AI assista
 
 #### 2.1.1 Authentication
 
-**Initial Implementation (v1.0):**
+**Current Implementation:**
 
-- Support API key authentication only
-
-**Future Implementations:**
-
+- Support API key authentication
 - Support certificate-based authentication
 - Support username/password authentication
 - Authentication details provided via environment variables
-- Certificate loading from file path or machine store
+- Certificate loading from file path
 
 #### 2.1.2 Connection Management
 
@@ -113,29 +110,30 @@ Each tool will include:
 
 ### 3.3 Environment Configuration
 
-**Initial Implementation (v1.0):**
+**Current Implementation:**
 
 Required environment variables:
 
 ```
-# Authentication
+# Authentication Method
+RAVENDB_AUTH_METHOD=apikey  # Options: apikey, certificate, username
+
+# API Key Authentication
 RAVENDB_API_KEY=key  # API key for authentication
+
+# Certificate Authentication
+RAVENDB_CERT_PATH=/path/to/cert.pfx  # For certificate auth
+RAVENDB_CERT_PASSWORD=password  # For certificate auth (optional if not password-protected)
+
+# Username/Password Authentication
+RAVENDB_USERNAME=user  # For username auth
+RAVENDB_PASSWORD=pass  # For username auth
 
 # Connection
 RAVENDB_URL=https://server:port  # Default RavenDB server URL
-```
 
-**Future Implementation:**
-
-Additional environment variables for other authentication methods:
-
-```
-# Authentication
-RAVENDB_AUTH_METHOD=certificate  # Options: certificate, apikey, username
-RAVENDB_CERT_PATH=/path/to/cert.pfx  # For certificate auth
-RAVENDB_CERT_PASSWORD=password  # For certificate auth
-RAVENDB_USERNAME=user  # For username auth
-RAVENDB_PASSWORD=pass  # For username auth
+# Optional settings
+RAVENDB_QUERY_TIMEOUT=30000  # Query timeout in milliseconds (optional)
 ```
 
 ## 4. Implementation Plan
@@ -169,7 +167,6 @@ RAVENDB_PASSWORD=pass  # For username auth
 
 ### 4.5 Future Phases (Post v1.0)
 
-- Additional authentication methods (certificate, username/password)
 - Performance optimizations
 - Advanced features
 
@@ -199,6 +196,8 @@ flowchart TB
     end
     
     Auth --> ApiKey[API Key Auth]
+    Auth --> Cert[Certificate Auth]
+    Auth --> UserPass[Username/Password Auth]
     Client --> RavenDB[RavenDB Server]
 ```
 

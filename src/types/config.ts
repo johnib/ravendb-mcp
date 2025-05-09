@@ -5,6 +5,8 @@ import { z } from 'zod';
  */
 export enum AuthenticationMethod {
   ApiKey = 'apikey',
+  Certificate = 'certificate',
+  Username = 'username',
 }
 
 /**
@@ -27,6 +29,26 @@ export interface RavenDBConfig {
   apiKey?: string;
 
   /**
+   * Certificate path for certificate-based authentication
+   */
+  certPath?: string;
+
+  /**
+   * Certificate password for certificate-based authentication
+   */
+  certPassword?: string;
+
+  /**
+   * Username for username/password authentication
+   */
+  username?: string;
+
+  /**
+   * Password for username/password authentication
+   */
+  password?: string;
+
+  /**
    * Query timeout in milliseconds
    */
   queryTimeout?: number;
@@ -39,6 +61,10 @@ const ConfigSchema = z.object({
   authMethod: z.nativeEnum(AuthenticationMethod),
   defaultUrl: z.string().url().optional(),
   apiKey: z.string().optional(),
+  certPath: z.string().optional(),
+  certPassword: z.string().optional(),
+  username: z.string().optional(),
+  password: z.string().optional(),
   queryTimeout: z.number().positive().optional(),
 });
 
@@ -59,6 +85,19 @@ export function validateConfig(config: RavenDBConfig): RavenDBConfig {
     !validated.apiKey
   ) {
     throw new Error('API key is required for API key authentication');
+  } else if (validated.authMethod === AuthenticationMethod.Certificate) {
+    if (!validated.certPath) {
+      throw new Error(
+        'Certificate path is required for certificate authentication',
+      );
+    }
+    // Certificate password can be optional if the certificate is not password-protected
+  } else if (validated.authMethod === AuthenticationMethod.Username) {
+    if (!validated.username || !validated.password) {
+      throw new Error(
+        'Username and password are required for username authentication',
+      );
+    }
   }
 
   return validated;
@@ -70,10 +109,14 @@ export function validateConfig(config: RavenDBConfig): RavenDBConfig {
  * @returns The configuration object
  */
 export function configFromEnv(): RavenDBConfig {
-  const authMethod =
-    process.env.RAVENDB_AUTH_METHOD?.toLowerCase() === 'apikey'
-      ? AuthenticationMethod.ApiKey
-      : AuthenticationMethod.ApiKey; // Default to API key auth for now
+  const authMethodStr = process.env.RAVENDB_AUTH_METHOD?.toLowerCase();
+  let authMethod = AuthenticationMethod.ApiKey; // Default
+
+  if (authMethodStr === 'certificate') {
+    authMethod = AuthenticationMethod.Certificate;
+  } else if (authMethodStr === 'username') {
+    authMethod = AuthenticationMethod.Username;
+  }
 
   const config: RavenDBConfig = {
     authMethod,
@@ -86,6 +129,12 @@ export function configFromEnv(): RavenDBConfig {
   // Add authentication method-specific config
   if (authMethod === AuthenticationMethod.ApiKey) {
     config.apiKey = process.env.RAVENDB_API_KEY;
+  } else if (authMethod === AuthenticationMethod.Certificate) {
+    config.certPath = process.env.RAVENDB_CERT_PATH;
+    config.certPassword = process.env.RAVENDB_CERT_PASSWORD;
+  } else if (authMethod === AuthenticationMethod.Username) {
+    config.username = process.env.RAVENDB_USERNAME;
+    config.password = process.env.RAVENDB_PASSWORD;
   }
 
   return config;

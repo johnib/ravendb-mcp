@@ -140,10 +140,70 @@ export function handleRavenDBError(error: any, operation: string): never {
     mcpError = error;
   } else {
     const message = error instanceof Error ? error.message : String(error);
+    let errorCode = 'unknown';
+    let statusCode = 500;
+    let enhancedMessage = message;
+
+    // Detect authentication-related errors based on error message patterns
+    if (typeof message === 'string') {
+      // Certificate authentication errors
+      if (message.includes('certificate') || message.includes('cert')) {
+        if (
+          message.includes('not found') ||
+          message.includes('could not find') ||
+          message.includes('no such file')
+        ) {
+          errorCode = 'certificate_not_found';
+          statusCode = 401;
+          enhancedMessage = `Certificate file not found: ${message}. Please check the RAVENDB_CERT_PATH environment variable.`;
+        } else if (
+          message.includes('password') ||
+          message.includes('passphrase')
+        ) {
+          errorCode = 'certificate_password_invalid';
+          statusCode = 401;
+          enhancedMessage = `Invalid certificate password: ${message}. Please check the RAVENDB_CERT_PASSWORD environment variable.`;
+        } else if (
+          message.includes('invalid') ||
+          message.includes('malformed') ||
+          message.includes('corrupt')
+        ) {
+          errorCode = 'certificate_invalid';
+          statusCode = 401;
+          enhancedMessage = `Invalid certificate: ${message}. Please ensure the certificate is in the correct format.`;
+        } else if (message.includes('expired')) {
+          errorCode = 'certificate_expired';
+          statusCode = 401;
+          enhancedMessage = `Certificate expired: ${message}. Please provide a valid, non-expired certificate.`;
+        } else {
+          errorCode = 'certificate_error';
+          statusCode = 401;
+          enhancedMessage = `Certificate error: ${message}. Please check your certificate configuration.`;
+        }
+      }
+      // Username/password authentication errors
+      else if (
+        message.includes('username') ||
+        message.includes('password') ||
+        message.includes('credentials') ||
+        message.includes('unauthorized')
+      ) {
+        errorCode = 'auth_failed';
+        statusCode = 401;
+        enhancedMessage = `Authentication failed: ${message}. Please check your username and password.`;
+      }
+      // API key authentication errors
+      else if (message.includes('api key') || message.includes('apikey')) {
+        errorCode = 'api_key_invalid';
+        statusCode = 401;
+        enhancedMessage = `API key authentication failed: ${message}. Please check your API key.`;
+      }
+    }
+
     const ravenDBError = createRavenDBMcpError(
-      `Error during ${operation}: ${message}`,
-      error.code || 'unknown',
-      error.statusCode || 500,
+      `Error during ${operation}: ${enhancedMessage}`,
+      error.code || errorCode,
+      error.statusCode || statusCode,
       error.details,
     );
     mcpError = convertToMcpError(ravenDBError);

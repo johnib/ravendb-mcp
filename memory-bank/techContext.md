@@ -25,7 +25,7 @@
 - Node.js 16+ installed
 - npm or yarn package manager
 - Access to a RavenDB 7.x instance for testing
-- Authentication credentials (API key, certificate, or username/password)
+- Authentication credentials (certificate for secure mode, or none for non-secured mode)
 
 ### Local Setup
 
@@ -54,18 +54,11 @@ The server is configured using environment variables or a `.env` file:
 
 ```env
 # Authentication Method
-RAVENDB_AUTH_METHOD=apikey  # Options: apikey, certificate, username
-
-# API Key Authentication
-RAVENDB_API_KEY=key  # API key for authentication
+RAVENDB_AUTH_METHOD=certificate  # Options: certificate, none
 
 # Certificate Authentication
-RAVENDB_CERT_PATH=/path/to/cert.pfx  # For certificate auth
+RAVENDB_CERT_PATH=/path/to/cert.pfx  # For certificate auth (PFX or PEM)
 RAVENDB_CERT_PASSWORD=password  # For certificate auth (optional)
-
-# Username/Password Authentication
-RAVENDB_USERNAME=user  # For username auth
-RAVENDB_PASSWORD=pass  # For username auth
 
 # Connection
 RAVENDB_URL=https://server:port  # Default RavenDB server URL
@@ -87,8 +80,9 @@ For integration with Cline AI:
       "command": "npx",
       "args": ["-y", "ravendb-mcp"],
       "env": {
-        "RAVENDB_AUTH_METHOD": "apikey",
-        "RAVENDB_API_KEY": "your_api_key_here",
+        "RAVENDB_AUTH_METHOD": "certificate",
+        "RAVENDB_CERT_PATH": "/path/to/certificate.pfx",
+        "RAVENDB_CERT_PASSWORD": "certificate_password",
         "RAVENDB_URL": "https://your-ravendb-server:port"
       },
       "transportType": "stdio"
@@ -159,7 +153,7 @@ npx ravendb-mcp
 ### Current Phase
 
 - Basic implementation with core functionality
-- API key authentication
+- Certificate authentication and non-secured mode
 - Essential database operations
 
 ### Future Technical Enhancements

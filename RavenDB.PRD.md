@@ -22,9 +22,8 @@ Companies using RavenDB in production environments who wish to enable AI assista
 
 **Current Implementation:**
 
-- Support API key authentication
-- Support certificate-based authentication
-- Support username/password authentication
+- Support certificate-based authentication (PFX or PEM)
+- Support non-secured mode (no authentication)
 - Authentication details provided via environment variables
 - Certificate loading from file path
 
@@ -116,18 +115,11 @@ Required environment variables:
 
 ```
 # Authentication Method
-RAVENDB_AUTH_METHOD=apikey  # Options: apikey, certificate, username
-
-# API Key Authentication
-RAVENDB_API_KEY=key  # API key for authentication
+RAVENDB_AUTH_METHOD=certificate  # Options: certificate, none
 
 # Certificate Authentication
-RAVENDB_CERT_PATH=/path/to/cert.pfx  # For certificate auth
+RAVENDB_CERT_PATH=/path/to/cert.pfx  # For certificate auth (PFX or PEM)
 RAVENDB_CERT_PASSWORD=password  # For certificate auth (optional if not password-protected)
-
-# Username/Password Authentication
-RAVENDB_USERNAME=user  # For username auth
-RAVENDB_PASSWORD=pass  # For username auth
 
 # Connection
 RAVENDB_URL=https://server:port  # Default RavenDB server URL
@@ -138,10 +130,10 @@ RAVENDB_QUERY_TIMEOUT=30000  # Query timeout in milliseconds (optional)
 
 ## 4. Implementation Plan
 
-### 4.1 Phase 1: Core Infrastructure with API Key Auth
+### 4.1 Phase 1: Core Infrastructure with Certificate Auth
 
 - Server setup and configuration
-- API key authentication implementation
+- Certificate authentication implementation
 - Connection management
 - Basic error handling
 
@@ -195,9 +187,8 @@ flowchart TB
         Connection --> Client[RavenDB Node.js Client]
     end
     
-    Auth --> ApiKey[API Key Auth]
     Auth --> Cert[Certificate Auth]
-    Auth --> UserPass[Username/Password Auth]
+    Auth --> None[Non-secured Mode]
     Client --> RavenDB[RavenDB Server]
 ```
 

@@ -13,7 +13,7 @@ The project has progressed substantially with the following in place:
 - Full project structure established
 - Core documentation created (PRD, README)
 - All planned tools implemented
-- All three authentication methods implemented
+- Both authentication methods implemented (certificate and non-secured mode)
 - Connection management system with persistence
 - Error handling and validation
 - Environment variable configuration
@@ -60,9 +60,8 @@ The project has progressed substantially with the following in place:
 
 ### Authentication Layer
 
-- [x] API key authentication
 - [x] Certificate-based authentication
-- [x] Username/password authentication
+- [x] Non-secured mode
 - [x] Auth method switching utility
 - [x] Secure credential handling
 

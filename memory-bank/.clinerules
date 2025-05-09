@@ -28,7 +28,7 @@
 
 ### Authentication
 
-- Implement authentication methods in order: API key, certificate, username/password
+- Implement authentication methods: certificate and non-secured mode
 - Store sensitive information in environment variables
 - Support .env file for local development
 - Keep authentication logic separate from tool implementation
@@ -96,9 +96,9 @@
 
 ### Authentication Complexity
 
-- Multiple authentication methods increase complexity
-- Need secure handling of credentials
 - Certificate loading requires file system access
+- Managing certificate credentials securely
+- Proper handling of non-secured mode with clear security warnings
 
 ### Query Performance
 

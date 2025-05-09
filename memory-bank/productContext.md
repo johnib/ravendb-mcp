@@ -28,9 +28,8 @@ The RavenDB MCP Server provides a standardized Model Context Protocol (MCP) serv
 
 ### Authentication
 
-- API key authentication
-- Certificate-based authentication
-- Username/password authentication
+- Certificate-based authentication (PFX or PEM)
+- Non-secured mode (no authentication)
 
 ### Connection Management
 

@@ -17,7 +17,7 @@ The project has progressed significantly with the following in place:
 
 - Complete project structure established
 - All core tools implemented
-- All three authentication methods implemented (API key, certificate, username/password)
+- Both authentication methods implemented (certificate and non-secured mode)
 - Connection management system implemented
 - Error handling utilities created
 - Input validation with Zod schemas
@@ -28,7 +28,7 @@ According to the implementation plan in the PRD, we've completed most of the pla
 
 - [x] Initial project setup
 - [x] Core server configuration
-- [x] Authentication implementation (API key, certificate, username/password)
+- [x] Authentication implementation (certificate and non-secured mode)
 - [x] Connection management
 - [x] Basic error handling
 - [x] Tool schema definitions
@@ -37,13 +37,12 @@ According to the implementation plan in the PRD, we've completed most of the pla
 
 ### Authentication Strategy
 
-All three authentication methods have been implemented:
+Both authentication methods have been implemented:
 
-- API key authentication
-- Certificate-based authentication
-- Username/password authentication
+- Certificate-based authentication (PFX or PEM)
+- Non-secured mode (no authentication)
 
-The authentication strategy is configurable via environment variables, allowing users to choose their preferred method.
+The authentication strategy is configurable via environment variables, allowing users to choose their preferred method based on their security requirements.
 
 ### Connection Management
 

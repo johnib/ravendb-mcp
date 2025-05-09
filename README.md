@@ -18,9 +18,8 @@ This MCP server allows AI assistants to perform common RavenDB operations includ
 - Node.js 16+
 - RavenDB 7.x
 - One of the following authentication methods:
-  - API Key
-  - Certificate (.pfx file)
-  - Username and password
+  - Certificate (.pfx or .pem file)
+  - Non-secured mode (no authentication)
 
 ## Installation
 
@@ -40,19 +39,15 @@ Configure the server using environment variables or a `.env` file:
 
 ```
 # Authentication Method
-# Options: apikey, certificate, username
-RAVENDB_AUTH_METHOD=apikey
-
-# API Key Authentication
-RAVENDB_API_KEY=your_api_key_here
+# Options: certificate, none
+RAVENDB_AUTH_METHOD=certificate
 
 # Certificate Authentication
-# RAVENDB_CERT_PATH=/path/to/certificate.pfx
-# RAVENDB_CERT_PASSWORD=certificate_password
+RAVENDB_CERT_PATH=/path/to/certificate.pfx
+RAVENDB_CERT_PASSWORD=certificate_password
 
-# Username/Password Authentication
-# RAVENDB_USERNAME=your_username
-# RAVENDB_PASSWORD=your_password
+# Non-secured Mode (no authentication)
+# RAVENDB_AUTH_METHOD=none
 
 # Connection
 RAVENDB_URL=https://your-ravendb-server:port
@@ -65,28 +60,7 @@ RAVENDB_QUERY_TIMEOUT=30000  # Query timeout in milliseconds (optional)
 
 To configure this MCP server for use with Cline AI, add the following to your MCP configuration:
 
-#### API Key Authentication (Default)
-
-```json
-{
-  "mcpServers": {
-    "github.com/johnib/ravendb-mcp": {
-      "disabled": false,
-      "timeout": 60,
-      "command": "npx",
-      "args": ["-y", "ravendb-mcp"],
-      "env": {
-        "RAVENDB_AUTH_METHOD": "apikey",
-        "RAVENDB_API_KEY": "your_api_key_here",
-        "RAVENDB_URL": "https://your-ravendb-server:port"
-      },
-      "transportType": "stdio"
-    }
-  }
-}
-```
-
-#### Certificate Authentication
+#### Certificate Authentication (Default)
 
 ```json
 {
@@ -108,7 +82,7 @@ To configure this MCP server for use with Cline AI, add the following to your MC
 }
 ```
 
-#### Username/Password Authentication
+#### Non-secured Mode
 
 ```json
 {
@@ -119,10 +93,8 @@ To configure this MCP server for use with Cline AI, add the following to your MC
       "command": "npx",
       "args": ["-y", "ravendb-mcp"],
       "env": {
-        "RAVENDB_AUTH_METHOD": "username",
-        "RAVENDB_USERNAME": "your_username",
-        "RAVENDB_PASSWORD": "your_password",
-        "RAVENDB_URL": "https://your-ravendb-server:port"
+        "RAVENDB_AUTH_METHOD": "none",
+        "RAVENDB_URL": "http://your-ravendb-server:port"
       },
       "transportType": "stdio"
     }

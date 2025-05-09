@@ -1,0 +1,114 @@
+# RavenDB MCP Server - Project Intelligence
+
+## Project Patterns
+
+### File Naming & Organization
+
+- TypeScript files use `.ts` extension
+- Use camelCase for file names
+- Group related functionality in subdirectories
+- Keep directory structure flat where possible
+
+### Code Style
+
+- Use TypeScript for type safety
+- Follow Prettier and ESLint configurations
+- Use async/await pattern for asynchronous operations
+- Prefer explicit types over implicit ones
+- Use Zod for schema validation
+
+### Documentation
+
+- Keep PRD and README in sync
+- Document each tool with clear examples
+- Include input/output examples for each operation
+- Update documentation as features are implemented
+
+## Implementation Guidelines
+
+### Authentication
+
+- Implement authentication methods in order: API key, certificate, username/password
+- Store sensitive information in environment variables
+- Support .env file for local development
+- Keep authentication logic separate from tool implementation
+
+### Connection Management
+
+- Use singleton pattern for connection instance
+- Maintain session state in memory
+- Implement robust error handling for connection failures
+- Provide clear connection status information
+
+### Tool Implementation
+
+- Each tool should have a dedicated handler function
+- Validate all inputs with Zod schemas
+- Follow consistent response formatting
+- Include appropriate error handling
+- Document tool schema and functionality
+
+### Error Handling
+
+- Categorize errors meaningfully
+- Provide clear error messages
+- Omit sensitive stack traces
+- Include recovery instructions where possible
+- Log errors for debugging (without sensitive information)
+
+## Development Workflow
+
+### Testing Strategy
+
+- No formal testing strategy is in place yet
+- Future testing will need to focus on tool functionality and error scenarios
+
+### Deployment Process
+
+- Build TypeScript to JavaScript
+- Package as npm module
+- Test installation via npx
+- Verify environment variable configuration
+
+## User Preferences
+
+### Configuration
+
+- Support both environment variables and .env file
+- Make all authentication methods optional but require at least one
+- Provide sensible defaults for timeouts and other settings
+- Allow override of default settings
+
+### Tool Usage
+
+- Keep tool inputs minimal but sufficient
+- Return formatted JSON responses
+- Include error details in responses
+- Maintain backward compatibility as features are added
+
+## Known Challenges
+
+### Connection Persistence
+
+- RavenDB connections must persist between tool calls
+- Need to handle timeout and reconnection logic
+- Balance connection pooling vs. single persistent connection
+
+### Authentication Complexity
+
+- Multiple authentication methods increase complexity
+- Need secure handling of credentials
+- Certificate loading requires file system access
+
+### Query Performance
+
+- Large result sets may impact performance
+- Need to consider pagination or streaming for large results
+- Handle query timeouts gracefully
+
+## Roadmap Insights
+
+- Start with core functionality and add advanced features later
+- Prioritize reliability over performance initially
+- Focus on clear error messages for better usability
+- Plan for backward compatibility in future versions

@@ -20,8 +20,13 @@ Companies using RavenDB in production environments who wish to enable AI assista
 
 #### 2.1.1 Authentication
 
+**Initial Implementation (v1.0):**
+
+- Support API key authentication only
+
+**Future Implementations:**
+
 - Support certificate-based authentication
-- Support API key authentication
 - Support username/password authentication
 - Authentication details provided via environment variables
 - Certificate loading from file path or machine store
@@ -85,7 +90,7 @@ Companies using RavenDB in production environments who wish to enable AI assista
 **Core Components**
 
 - MCP Server Interface
-- Authentication Layer
+- Authentication Layer (API key initially)
 - Tool Handlers
 - RavenDB Operations
 - Connection Management
@@ -108,33 +113,43 @@ Each tool will include:
 
 ### 3.3 Environment Configuration
 
+**Initial Implementation (v1.0):**
+
 Required environment variables:
+
+```
+# Authentication
+RAVENDB_API_KEY=key  # API key for authentication
+
+# Connection
+RAVENDB_URL=https://server:port  # Default RavenDB server URL
+```
+
+**Future Implementation:**
+
+Additional environment variables for other authentication methods:
 
 ```
 # Authentication
 RAVENDB_AUTH_METHOD=certificate  # Options: certificate, apikey, username
 RAVENDB_CERT_PATH=/path/to/cert.pfx  # For certificate auth
 RAVENDB_CERT_PASSWORD=password  # For certificate auth
-RAVENDB_API_KEY=key  # For API key auth
 RAVENDB_USERNAME=user  # For username auth
 RAVENDB_PASSWORD=pass  # For username auth
-
-# Connection
-RAVENDB_URL=https://server:port  # Default RavenDB server URL
 ```
 
 ## 4. Implementation Plan
 
-### 4.1 Phase 1: Core Infrastructure
+### 4.1 Phase 1: Core Infrastructure with API Key Auth
 
 - Server setup and configuration
-- Authentication implementation
+- API key authentication implementation
 - Connection management
 - Basic error handling
 
 ### 4.2 Phase 2: Basic Tools
 
-- initialize-connection
+- initialize-connection (with API key auth)
 - select-database
 - show-collections
 - get-document
@@ -152,10 +167,17 @@ RAVENDB_URL=https://server:port  # Default RavenDB server URL
 - Usage documentation
 - Example queries and operations
 
+### 4.5 Future Phases (Post v1.0)
+
+- Additional authentication methods (certificate, username/password)
+- Performance optimizations
+- Advanced features
+
 ## 5. Future Considerations
 
 Potential future enhancements (not in initial scope):
 
+- Additional authentication methods
 - Performance optimizations and caching
 - Advanced RavenDB features (attachments, time series, etc.)
 - Streaming capabilities for large result sets
@@ -176,7 +198,7 @@ flowchart TB
         Connection --> Client[RavenDB Node.js Client]
     end
     
-    Auth --> Certs[Certificate/API Key]
+    Auth --> ApiKey[API Key Auth]
     Client --> RavenDB[RavenDB Server]
 ```
 

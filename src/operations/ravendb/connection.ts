@@ -1,5 +1,5 @@
 import { ErrorCode, McpError } from '@modelcontextprotocol/sdk/types.js';
-import { DocumentStore, IAuthOptions } from 'ravendb';
+import { DocumentStore } from 'ravendb';
 import {
   createRavenDBMcpError,
   handleRavenDBError,
@@ -68,13 +68,12 @@ export class RavenDBConnection {
         );
       }
 
-      // Create auth options based on the authentication method
-      const authOptions = this.createAuthOptions();
+      safeLog(
+        `Initializing connection to RavenDB at ${url} in non-secured mode`,
+      );
 
-      safeLog(`Initializing connection to RavenDB at ${url}`);
-
-      // Create and initialize the document store
-      this.documentStore = new DocumentStore(url, database, authOptions);
+      // Create and initialize the document store without auth options for non-secured mode
+      this.documentStore = new DocumentStore(url, database);
       this.documentStore.initialize();
       this.currentDatabase = database;
 
@@ -172,16 +171,5 @@ export class RavenDBConnection {
         400,
       );
     }
-  }
-
-  /**
-   * Create authentication options based on the configuration
-   *
-   * @returns Authentication options
-   */
-  private createAuthOptions(): IAuthOptions {
-    // Only supporting 'none' authentication method, which means no authentication
-    safeLog('Using non-secured mode (no authentication)');
-    return {};
   }
 }

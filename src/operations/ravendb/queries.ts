@@ -71,10 +71,9 @@ export async function showCollections(
       // Get collection info
       const collections = await session.advanced
         .rawQuery(
-          'SELECT DISTINCT c.@metadata.@collection as collection ' +
-            'FROM @all_docs as c ' +
+          'FROM @all_docs as c ' +
             'WHERE c.@metadata.@collection != null ' +
-            'ORDER BY collection',
+            'SELECT DISTINCT c.@metadata.@collection as collection',
         )
         .all();
 

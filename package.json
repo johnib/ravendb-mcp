@@ -24,7 +24,7 @@
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.0.0",
     "axios": "^1.4.0",
-    "dotenv": "^16.0.3",
+    "dotenv": "^17.3.1",
     "lru-cache": "^9.1.1",
     "ravendb": "^5.4.3",
     "zod": "^3.21.4",

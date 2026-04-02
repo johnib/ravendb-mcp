@@ -1,3 +1,5 @@
+[![MseeP.ai Security Assessment Badge](https://mseep.net/pr/johnib-ravendb-mcp-badge.png)](https://mseep.ai/app/johnib-ravendb-mcp)
+
 # RavenDB MCP Server
 
 A Model Context Protocol (MCP) server that enables AI assistants to interact with RavenDB databases through a standardized interface.
